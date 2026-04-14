@@ -34,6 +34,12 @@ const ChatHeader = () => {
       peer.ontrack = (event) => {
         if (audioRef.current) {
           audioRef.current.srcObject = event.streams[0];
+      
+          // 🔥 force play (fix for mobile browsers)
+          audioRef.current
+            .play()
+            .then(() => console.log("Audio playing"))
+            .catch((e) => console.log("Audio blocked:", e));
         }
       };
 
@@ -145,6 +151,12 @@ const ChatHeader = () => {
       peer.ontrack = (event) => {
         if (audioRef.current) {
           audioRef.current.srcObject = event.streams[0];
+      
+          // 🔥 force play (fix for mobile browsers)
+          audioRef.current
+            .play()
+            .then(() => console.log("Audio playing"))
+            .catch((e) => console.log("Audio blocked:", e));
         }
       };
 
@@ -267,7 +279,7 @@ const rejectCall = () => {
           </div>
         </div>
       )}
-      <audio ref={audioRef} autoPlay />
+      <audio ref={audioRef} autoPlay playsInline />
     </div>
   );
 };
