@@ -22,7 +22,10 @@ io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
 
   const userId = socket.handshake.query.userId;
-  if (userId) userSocketMap[userId] = socket.id;
+  if (userId) {
+    userSocketMap[userId] = socket.id;
+    socket.userId = userId;
+  }
 
   // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
@@ -32,6 +35,56 @@ io.on("connection", (socket) => {
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
+
+  // 📞 CALL USER (send offer)
+  socket.on("call-user", ({ to, offer }) => {
+    const receiverSocketId = getReceiverSocketId(to);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("incoming-call", {
+        from: socket.userId,
+        offer,
+      });
+    }
+  });
+
+  // ✅ ANSWER CALL
+  socket.on("answer-call", ({ to, answer }) => {
+    const callerSocketId = getReceiverSocketId(to);
+
+    if (callerSocketId) {
+      io.to(callerSocketId).emit("call-answered", {
+        answer,
+      });
+    }
+  });
+
+  // 🔁 ICE CANDIDATES (network connection data)
+  socket.on("ice-candidate", ({ to, candidate }) => {
+    const receiverSocketId = getReceiverSocketId(to);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("ice-candidate", candidate);
+    }
+  });
+
+  // 🔴 END CALL
+  socket.on("end-call", ({ to }) => {
+    const receiverSocketId = getReceiverSocketId(to);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("call-ended");
+    }
+  });
+
+  // ❌ CALL REJECTED
+  socket.on("call-rejected", ({ to }) => {
+    const receiverSocketId = getReceiverSocketId(to);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("call-rejected");
+    }
+  });  
 });
 
 export { io, app, server };

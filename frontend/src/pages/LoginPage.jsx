@@ -117,3 +117,14 @@ const LoginPage = () => {
   );
 };
 export default LoginPage;
+
+
+{/* <div className="hidden lg:flex items-center justify-center bg-base-200">
+  <img
+    src="doodle.png"
+    alt="Chat illustration"
+    className="max-w-md w-full object-contain"
+  />
+</div>
+  title={"Welcome back!"}
+  subtitle={"Sign in to continue your conversations and catch up with your messages."} */}

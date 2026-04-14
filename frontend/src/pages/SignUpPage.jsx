@@ -7,6 +7,9 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import toast from "react-hot-toast";
 
 const SignUpPage = () => {
+  const [step, setStep] = useState(1);
+  const [otp, setOtp] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -14,7 +17,7 @@ const SignUpPage = () => {
     password: "",
   });
 
-  const { signup, isSigningUp } = useAuthStore();
+  const { sendOtp, verifyOtp, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
@@ -26,12 +29,21 @@ const SignUpPage = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const success = validateForm();
+    if (!success) return;
 
-    if (success === true) signup(formData);
+    if (step === 1) {
+      await sendOtp({ email: formData.email });
+      setStep(2);
+    } else {
+      await verifyOtp({
+        ...formData,
+        otp,
+      });
+    }
   };
 
   return (
@@ -105,6 +117,7 @@ const SignUpPage = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
+
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -118,6 +131,20 @@ const SignUpPage = () => {
                 </button>
               </div>
             </div>
+            {step === 2 && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-medium">OTP</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
               {isSigningUp ? (
@@ -126,7 +153,7 @@ const SignUpPage = () => {
                   Loading...
                 </>
               ) : (
-                "Create Account"
+                step === 1 ? "Send OTP" : "Verify & Create Account"
               )}
             </button>
           </form>
@@ -152,3 +179,11 @@ const SignUpPage = () => {
   );
 };
 export default SignUpPage;
+
+{/* <div className="hidden lg:flex items-center justify-center bg-base-200">
+  <img
+    src="doodle.png"
+    alt="Chat illustration"
+    className="max-w-md w-full object-contain"
+  />
+</div> */}

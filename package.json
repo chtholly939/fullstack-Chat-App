@@ -1,7 +1,7 @@
 {
   "name": "chat-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "![Demo App](/frontend/public/screenshot-for-readme.png)",
   "main": "index.js",
   "scripts": {
     "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
@@ -9,5 +9,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/burakorkmez/fullstack-chat-app.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/burakorkmez/fullstack-chat-app/issues"
+  },
+  "homepage": "https://github.com/burakorkmez/fullstack-chat-app#readme"
 }

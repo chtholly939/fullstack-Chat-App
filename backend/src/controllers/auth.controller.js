@@ -3,6 +3,10 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
 
+import OTP from "../models/otp.model.js";
+import { generateOTP } from "../utils/otp.js";
+import { sendOTPEmail } from "../utils/mailer.js";
+
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   try {
@@ -87,24 +91,44 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { profilePic, fullName } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    const updateData = {};
+
+    // ✅ If updating name
+    if (fullName) {
+      updateData.fullName = fullName;
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    // ✅ If updating image
+    if (profilePic) {
+      if (!profilePic.startsWith("data:image")) {
+        return res.status(400).json({ message: "Invalid image format" });
+      }
+
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        folder: "chat-app-profiles",
+        resource_type: "image",
+      });
+
+      updateData.profilePic = uploadResponse.secure_url;
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      updateData,
       { new: true }
     );
 
     res.status(200).json(updatedUser);
+
   } catch (error) {
-    console.log("error in update profile:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.log("❌ error in update profile:", error);
+
+    res.status(500).json({
+      message: "Profile update failed",
+    });
   }
 };
 
@@ -114,5 +138,61 @@ export const checkAuth = (req, res) => {
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const otp = generateOTP();
+
+    await OTP.create({
+      email,
+      otp,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 mins
+    });
+
+    await sendOTPEmail(email, otp);
+
+    res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error sending OTP" });
+  }
+};
+
+
+export const verifyOtpAndSignup = async (req, res) => {
+  try {
+    const { email, password, fullName, otp } = req.body;
+
+    const otpRecord = await OTP.findOne({ email, otp });
+
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (otpRecord.expiresAt < new Date()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      fullName,
+    });
+
+    await OTP.deleteMany({ email });
+
+    res.status(201).json({ message: "User created", user });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Signup failed" });
   }
 };

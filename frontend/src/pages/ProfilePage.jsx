@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
+import { useEffect } from "react";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(authUser?.fullName || "");
+
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -20,6 +25,19 @@ const ProfilePage = () => {
       await updateProfile({ profilePic: base64Image });
     };
   };
+
+  const handleSave = async () => {
+    if (!name.trim()) return;
+
+    await updateProfile({ fullName: name });
+    setIsEditing(false);
+  };
+  
+  useEffect(() => {
+    if (authUser?.fullName) {
+      setName(authUser.fullName);
+    }
+  }, [authUser]);
 
   return (
     <div className="h-screen pt-20">
@@ -71,7 +89,48 @@ const ProfilePage = () => {
                 <User className="w-4 h-4" />
                 Full Name
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{authUser?.fullName}</p>
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={name}
+                  autoFocus
+                  onChange={(e) => setName(e.target.value)}
+                />
+              ) : (
+                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
+                  {authUser?.fullName}
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-2 mt-2">
+              {isEditing ? (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    onClick={handleSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setName(authUser.fullName); // reset
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setIsEditing(true)}
+                >
+                  Edit Name
+                </button>
+              )}
             </div>
 
             <div className="space-y-1.5">

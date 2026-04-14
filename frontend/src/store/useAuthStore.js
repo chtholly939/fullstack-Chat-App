@@ -28,15 +28,24 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  signup: async (data) => {
+  sendOtp: async (data) => {
+    try {
+      await axiosInstance.post("/auth/send-otp", data);
+      toast.success("OTP sent to your email");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to send OTP");
+    }
+  },
+
+  verifyOtp: async (data) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
-      toast.success("Account created successfully");
-      get().connectSocket();
+      await axiosInstance.post("/auth/verify-otp", data);
+
+      toast.success("Account created! Please login");
+
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "OTP verification failed");
     } finally {
       set({ isSigningUp: false });
     }
