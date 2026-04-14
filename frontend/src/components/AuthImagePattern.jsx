@@ -7,7 +7,7 @@ import {
   Shield,
   Clock,
   Smile,
-  Paperclip,
+  Palette,
 } from "lucide-react";
 
 const AuthImagePattern = ({ title, subtitle }) => {
@@ -20,7 +20,7 @@ const AuthImagePattern = ({ title, subtitle }) => {
     Shield,
     Clock,
     Smile,
-    Paperclip,
+    Palette,
   ];
 
   return (
