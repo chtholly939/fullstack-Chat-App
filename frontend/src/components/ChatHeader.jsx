@@ -32,24 +32,41 @@ const ChatHeader = () => {
       });
 
       peer.ontrack = (event) => {
-        if (audioRef.current) {
-          const stream = event.streams[0];
+        console.log("TRACK EVENT:", event);
 
-          console.log("TRACK RECEIVED:", stream);
+        const stream = event.streams[0];
 
+        // 🔥 IMPORTANT: fallback if streams empty
+        if (!stream) {
+          console.log("No stream, creating manually");
+
+          const newStream = new MediaStream();
+          newStream.addTrack(event.track);
+
+          audioRef.current.srcObject = newStream;
+        } else {
           audioRef.current.srcObject = stream;
-
-          // 🔥 FORCE AUDIO SETTINGS
-          audioRef.current.muted = false;
-          audioRef.current.volume = 1;
-
-          setTimeout(() => {
-            audioRef.current
-              .play()
-              .then(() => console.log("Audio playing"))
-              .catch((e) => console.log("Play failed:", e));
-          }, 100);
         }
+
+        console.log(
+          "Audio tracks:",
+          audioRef.current.srcObject.getAudioTracks()
+        );
+
+        console.log(
+          "Tracks count:",
+          audioRef.current.srcObject.getAudioTracks().length
+        );
+
+        audioRef.current.muted = false;
+        audioRef.current.volume = 1;
+
+        setTimeout(() => {
+          audioRef.current
+            .play()
+            .then(() => console.log("Audio playing"))
+            .catch((e) => console.log("Play failed:", e));
+        }, 100);
       };
 
       const offer = await peer.createOffer();
@@ -177,24 +194,41 @@ const ChatHeader = () => {
       });
 
       peer.ontrack = (event) => {
-        if (audioRef.current) {
-          const stream = event.streams[0];
+        console.log("TRACK EVENT:", event);
 
-          console.log("TRACK RECEIVED:", stream);
+        const stream = event.streams[0];
 
+        // 🔥 IMPORTANT: fallback if streams empty
+        if (!stream) {
+          console.log("No stream, creating manually");
+
+          const newStream = new MediaStream();
+          newStream.addTrack(event.track);
+
+          audioRef.current.srcObject = newStream;
+        } else {
           audioRef.current.srcObject = stream;
-
-          // 🔥 FORCE AUDIO SETTINGS
-          audioRef.current.muted = false;
-          audioRef.current.volume = 1;
-
-          setTimeout(() => {
-            audioRef.current
-              .play()
-              .then(() => console.log("Audio playing"))
-              .catch((e) => console.log("Play failed:", e));
-          }, 100);
         }
+
+        console.log(
+          "Audio tracks:",
+          audioRef.current.srcObject.getAudioTracks()
+        );
+
+        console.log(
+          "Tracks count:",
+          audioRef.current.srcObject.getAudioTracks().length
+        );
+
+        audioRef.current.muted = false;
+        audioRef.current.volume = 1;
+
+        setTimeout(() => {
+          audioRef.current
+            .play()
+            .then(() => console.log("Audio playing"))
+            .catch((e) => console.log("Play failed:", e));
+        }, 100);
       };
 
       await peer.setRemoteDescription(incomingCall.offer);
