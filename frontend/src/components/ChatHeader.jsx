@@ -33,13 +33,18 @@ const ChatHeader = () => {
 
       peer.ontrack = (event) => {
         if (audioRef.current) {
-          audioRef.current.srcObject = event.streams[0];
-      
-          // 🔥 force play (fix for mobile browsers)
-          audioRef.current
-            .play()
-            .then(() => console.log("Audio playing"))
-            .catch((e) => console.log("Audio blocked:", e));
+          const stream = event.streams[0];
+
+          console.log("TRACK RECEIVED:", stream);
+
+          audioRef.current.srcObject = stream;
+
+          setTimeout(() => {
+            audioRef.current
+              .play()
+              .then(() => console.log("Audio playing"))
+              .catch((e) => console.log("Audio blocked:", e));
+          }, 100);
         }
       };
 
@@ -74,7 +79,7 @@ const ChatHeader = () => {
     if (!socket) return;
 
     socket.on("call-answered", async ({ answer }) => {
-      console.log("Call answered!");
+      console.log("Call answered");
 
       if (peerRef.current) {
         await peerRef.current.setRemoteDescription(answer);
@@ -87,9 +92,11 @@ const ChatHeader = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("ice-candidate", async (candidate) => {
+    socket.on("ice-candidate", async ({ candidate }) => {
+      console.log("ICE RECEIVED:", candidate);
+
       try {
-        if (peerRef.current) {
+        if (peerRef.current && candidate) {
           await peerRef.current.addIceCandidate(candidate);
         }
       } catch (error) {
@@ -150,13 +157,18 @@ const ChatHeader = () => {
 
       peer.ontrack = (event) => {
         if (audioRef.current) {
-          audioRef.current.srcObject = event.streams[0];
-      
-          // 🔥 force play (fix for mobile browsers)
-          audioRef.current
-            .play()
-            .then(() => console.log("Audio playing"))
-            .catch((e) => console.log("Audio blocked:", e));
+          const stream = event.streams[0];
+
+          console.log("TRACK RECEIVED:", stream);
+
+          audioRef.current.srcObject = stream;
+
+          setTimeout(() => {
+            audioRef.current
+              .play()
+              .then(() => console.log("Audio playing"))
+              .catch((e) => console.log("Audio blocked:", e));
+          }, 100);
         }
       };
 
