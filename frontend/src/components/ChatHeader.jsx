@@ -64,9 +64,7 @@ const ChatHeader = () => {
         }
       };
 
-      const offer = await peer.createOffer({
-        offerToReceiveAudio: true,
-      });
+      const offer = await peer.createOffer();
       await peer.setLocalDescription(offer);
 
       socket.emit("call-user", {
@@ -224,9 +222,7 @@ const ChatHeader = () => {
 
       await peer.setRemoteDescription(incomingCall.offer);
 
-      const answer = await peer.createAnswer({
-        offerToReceiveAudio: true,
-      });
+      const answer = await peer.createAnswer();
       await peer.setLocalDescription(answer);
 
       socket.emit("answer-call", {
