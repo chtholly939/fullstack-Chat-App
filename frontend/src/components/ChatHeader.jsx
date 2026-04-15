@@ -39,11 +39,15 @@ const ChatHeader = () => {
 
           audioRef.current.srcObject = stream;
 
+          // 🔥 FORCE AUDIO SETTINGS
+          audioRef.current.muted = false;
+          audioRef.current.volume = 1;
+
           setTimeout(() => {
             audioRef.current
               .play()
               .then(() => console.log("Audio playing"))
-              .catch((e) => console.log("Audio blocked:", e));
+              .catch((e) => console.log("Play failed:", e));
           }, 100);
         }
       };
@@ -180,11 +184,15 @@ const ChatHeader = () => {
 
           audioRef.current.srcObject = stream;
 
+          // 🔥 FORCE AUDIO SETTINGS
+          audioRef.current.muted = false;
+          audioRef.current.volume = 1;
+
           setTimeout(() => {
             audioRef.current
               .play()
               .then(() => console.log("Audio playing"))
-              .catch((e) => console.log("Audio blocked:", e));
+              .catch((e) => console.log("Play failed:", e));
           }, 100);
         }
       };
@@ -308,7 +316,7 @@ const rejectCall = () => {
           </div>
         </div>
       )}
-      <audio ref={audioRef} autoPlay playsInline />
+      <audio ref={audioRef} autoPlay playsInline controls />
     </div>
   );
 };
