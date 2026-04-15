@@ -92,7 +92,7 @@ const ChatHeader = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("ice-candidate", async ({ candidate }) => {
+    socket.on("ice-candidate", async (candidate) => {
       console.log("ICE RECEIVED:", candidate);
 
       try {
