@@ -32,41 +32,27 @@ const ChatHeader = () => {
       });
 
       peer.ontrack = (event) => {
-        console.log("TRACK EVENT:", event);
-
         const stream = event.streams[0];
 
-        // 🔥 IMPORTANT: fallback if streams empty
-        if (!stream) {
-          console.log("No stream, creating manually");
+        console.log("TRACK EVENT:", event);
 
-          const newStream = new MediaStream();
-          newStream.addTrack(event.track);
-
-          audioRef.current.srcObject = newStream;
-        } else {
+        if (audioRef.current) {
+          audioRef.current.srcObject = null; // 🔥 reset first
           audioRef.current.srcObject = stream;
+
+          audioRef.current.muted = false;
+          audioRef.current.volume = 1;
+
+          // 🔥 FORCE reload + play
+          audioRef.current.load();
+
+          setTimeout(() => {
+            audioRef.current
+              .play()
+              .then(() => console.log("Audio playing"))
+              .catch((e) => console.log("Play failed:", e));
+          }, 200);
         }
-
-        console.log(
-          "Audio tracks:",
-          audioRef.current.srcObject.getAudioTracks()
-        );
-
-        console.log(
-          "Tracks count:",
-          audioRef.current.srcObject.getAudioTracks().length
-        );
-
-        audioRef.current.muted = false;
-        audioRef.current.volume = 1;
-
-        setTimeout(() => {
-          audioRef.current
-            .play()
-            .then(() => console.log("Audio playing"))
-            .catch((e) => console.log("Play failed:", e));
-        }, 100);
       };
 
       const offer = await peer.createOffer();
@@ -194,41 +180,27 @@ const ChatHeader = () => {
       });
 
       peer.ontrack = (event) => {
-        console.log("TRACK EVENT:", event);
-
         const stream = event.streams[0];
 
-        // 🔥 IMPORTANT: fallback if streams empty
-        if (!stream) {
-          console.log("No stream, creating manually");
+        console.log("TRACK EVENT:", event);
 
-          const newStream = new MediaStream();
-          newStream.addTrack(event.track);
-
-          audioRef.current.srcObject = newStream;
-        } else {
+        if (audioRef.current) {
+          audioRef.current.srcObject = null; // 🔥 reset first
           audioRef.current.srcObject = stream;
+
+          audioRef.current.muted = false;
+          audioRef.current.volume = 1;
+
+          // 🔥 FORCE reload + play
+          audioRef.current.load();
+
+          setTimeout(() => {
+            audioRef.current
+              .play()
+              .then(() => console.log("Audio playing"))
+              .catch((e) => console.log("Play failed:", e));
+          }, 200);
         }
-
-        console.log(
-          "Audio tracks:",
-          audioRef.current.srcObject.getAudioTracks()
-        );
-
-        console.log(
-          "Tracks count:",
-          audioRef.current.srcObject.getAudioTracks().length
-        );
-
-        audioRef.current.muted = false;
-        audioRef.current.volume = 1;
-
-        setTimeout(() => {
-          audioRef.current
-            .play()
-            .then(() => console.log("Audio playing"))
-            .catch((e) => console.log("Play failed:", e));
-        }, 100);
       };
 
       await peer.setRemoteDescription(incomingCall.offer);
