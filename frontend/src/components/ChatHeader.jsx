@@ -83,6 +83,23 @@ const ChatHeader = () => {
 
       if (peerRef.current) {
         await peerRef.current.setRemoteDescription(answer);
+
+        // 🔥 VERY IMPORTANT: ensure ontrack is set here also
+        peerRef.current.ontrack = (event) => {
+          if (audioRef.current) {
+            const stream = event.streams[0];
+
+            console.log("TRACK RECEIVED (caller):", stream);
+
+            audioRef.current.srcObject = stream;
+
+            setTimeout(() => {
+              audioRef.current
+                .play()
+                .catch((e) => console.log("Play failed:", e));
+            }, 100);
+          }
+        };
       }
     });
 
