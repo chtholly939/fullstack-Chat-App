@@ -20,8 +20,17 @@ const ChatHeader = () => {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       });
+
+      console.log("Local stream tracks:", stream.getAudioTracks());
+      console.log("Track enabled:", stream.getAudioTracks()[0]?.enabled);
+      console.log("Track muted:", stream.getAudioTracks()[0]?.muted);
+
       localStreamRef.current = stream;
 
       const peer = createPeerConnection(socket, selectedUser._id);
@@ -168,8 +177,16 @@ const ChatHeader = () => {
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       });
+      console.log("Local stream tracks:", stream.getAudioTracks());
+      console.log("Track enabled:", stream.getAudioTracks()[0]?.enabled);
+      console.log("Track muted:", stream.getAudioTracks()[0]?.muted);
+      
       localStreamRef.current = stream;
 
       const peer = createPeerConnection(socket, incomingCall.from);
